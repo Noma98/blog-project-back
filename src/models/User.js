@@ -31,10 +31,17 @@ userSchema.static("generateToken", function (user) {
         },
         config.tokenSecret,
         {
-            expiresIn: "1h"
+            expiresIn: "7d"
         }
     );
 })
-
+userSchema.static("findByToken", async function (token) {
+    try {
+        const decoded = jwt.verify(token, config.tokenSecret);
+        return await this.findOne({ _id: decoded._id, token });
+    } catch {
+        return null;
+    }
+})
 const User = mongoose.model("User", userSchema);
 export default User;

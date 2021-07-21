@@ -1,5 +1,4 @@
 import User from '../models/User.js';
-import config from '../config/config.js';
 
 export const postJoin = async (req, res) => {
     const { email, pwd, name } = req.body;
@@ -42,7 +41,7 @@ export const postLogin = async (req, res) => {
         await user.save();
         return res
             .status(200)
-            .cookie("x_auth", token)
+            .cookie("x_auth", token, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 * 24 })
             .json({
                 success: true,
                 message: "로그인 성공",
@@ -54,5 +53,24 @@ export const postLogin = async (req, res) => {
             success: false,
             message: err.message
         })
+    }
+}
+export const getLogout = async (req, res) => {
+    //로그인을 했었다면 auth 미들웨어를 거치면서 req에 토큰과 유저 정보를 받아서 온다.
+    try {
+        await User.findOneAndUpdate({ _id: req.user._id }, {
+            token: ""
+        });
+        return res.cookie("x_auth", "none", {
+            maxAge: 5000,
+            httpOnly: true,
+            secure: true
+        }).json({
+            success: true,
+            message: "로그아웃 성공!"
+        });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: err.message });
     }
 }
