@@ -11,7 +11,8 @@ export const authMiddleware = async (req, res, next) => {
     if (!user) {
         return res.json({
             success: false,
-            isAuth: false
+            isAuth: false,
+            _id: null,
         });
     }
     req.token = token;
