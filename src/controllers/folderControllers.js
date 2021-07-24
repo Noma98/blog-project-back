@@ -17,3 +17,17 @@ export const getCreate = async (req, res) => {
         res.json({ success: false });
     }
 }
+export const postEdit = async (req, res) => {
+    try {
+        const { folderId, newName } = req.body;
+        await Folder.findByIdAndUpdate(folderId, {
+            name: newName
+        });
+        return res.status(200).json({
+            success: true
+        })
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
