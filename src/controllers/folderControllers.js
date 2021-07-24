@@ -31,3 +31,17 @@ export const postEdit = async (req, res) => {
         return res.json({ success: false });
     }
 }
+export const postDelete = async (req, res) => {
+    try {
+        const user = req.user;
+        const { folderId } = req.body;
+        await Folder.findByIdAndRemove(folderId);
+        const updated = user.folders.filter(folder => folder._id !== folderId);
+        user.folders = updated;
+        await user.save();
+        return res.send({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.send({ success: false });
+    }
+}
