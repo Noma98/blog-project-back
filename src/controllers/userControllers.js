@@ -77,7 +77,7 @@ export const getLogout = async (req, res) => {
 export const getAuth = async (req, res) => {
     //여기는 인증 된 유저만.
     //req에 token과 user가 있다.
-    const { _id, name, email, avatar, blogInfo } = req.user;
+    const { _id, name, email, avatar, blogInfo, folders } = req.user;
     return res.status(200).json({
         success: true,
         isAuth: true,
@@ -85,6 +85,7 @@ export const getAuth = async (req, res) => {
         name,
         email,
         avatar,
-        blogInfo
+        blogInfo,
+        folders
     });
 }

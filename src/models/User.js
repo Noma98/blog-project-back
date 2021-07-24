@@ -9,8 +9,9 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     avatar: { type: String, default: "" },
     blogInfo: {
-        blogName: { type: String, default: "블로그 이름을 설정하세요.", maxLength: 15 },
+        blogName: { type: String, default: "blog name", maxLength: 15 },
     },
+    folders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Folder" }],
     token: { type: String, default: "" }
 });
 userSchema.pre("save", async function (next) {
@@ -38,7 +39,8 @@ userSchema.static("generateToken", function (user) {
 userSchema.static("findByToken", async function (token) {
     try {
         const decoded = jwt.verify(token, config.tokenSecret);
-        return await this.findOne({ _id: decoded._id, token });
+        const user = await this.findOne({ _id: decoded._id, token }).populate("folders");
+        return user;
     } catch {
         return null;
     }
