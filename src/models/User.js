@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     avatar: { type: String, default: "" },
     blogInfo: {
-        blogName: { type: String, default: "blog name", maxLength: 15 },
+        name: { type: String, default: "blog name", maxLength: 15 },
     },
     folders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Folder" }],
     token: { type: String, default: "" }
