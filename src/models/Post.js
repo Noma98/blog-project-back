@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const postSchema = new mongoose.Schema({
     title: { type: String, required: true },
-    createdAt: { type: Date, required: true },
+    createdAt: { type: String, required: true },
     description: { type: String, required: true },
     tags: [String],
     author: {
@@ -16,7 +16,7 @@ const postSchema = new mongoose.Schema({
 });
 
 postSchema.static("makeTags", function (tags) {
-    return tags.split(/ +/);
+    return tags.trim().split(/ +/);
 });
 
 const Post = mongoose.model("Post", postSchema);

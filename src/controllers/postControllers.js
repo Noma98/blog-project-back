@@ -1,11 +1,11 @@
 import Folder from '../models/Folder.js';
 import Post from '../models/Post.js'
 
-export const postNewPost = async (req, res) => {
+export const postCreate = async (req, res) => {
     try {
         const user = req.user;
         const { title, description, tags, selectedFolder: folderId } = req.body;
-        const createdAt = Date.now();
+        const createdAt = new Date().toISOString();
         await Post.create({
             title: title || "제목 없음",
             description,
@@ -23,4 +23,16 @@ export const postNewPost = async (req, res) => {
         console.log(err);
         return res.json({ success: false });
     }
+}
+export const postRead = async (req, res) => {
+    try {
+        const { folderId } = req.body;
+        const posts = await Post.find({ folder: folderId });
+        console.log(posts);
+        return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+
 }
