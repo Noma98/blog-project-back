@@ -28,11 +28,24 @@ export const postRead = async (req, res) => {
     try {
         const { folderId } = req.body;
         const posts = await Post.find({ folder: folderId });
-        console.log(posts);
         return res.status(200).json({ success: true, payload: posts });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });
     }
 
+}
+export const postDelete = async (req, res) => {
+    try {
+        const { postId, folderId } = req.body;
+        await Post.findByIdAndRemove(postId);
+        const folder = await Folder.findById(folderId);
+        const updated = folder.posts.filter(post => post != postId);
+        folder.posts = updated;
+        await folder.save();
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
 }
