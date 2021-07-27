@@ -5,7 +5,7 @@ export const postCreate = async (req, res) => {
     try {
         const user = req.user;
         const { title, description, tags, selectedFolder: folderId } = req.body;
-        const createdAt = new Date().toISOString();
+        const createdAt = Date.now();
         await Post.create({
             title: title || "제목 없음",
             description,
@@ -44,6 +44,16 @@ export const postDelete = async (req, res) => {
         folder.posts = updated;
         await folder.save();
         return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+export const postDetail = async (req, res) => {
+    try {
+        const { postId } = req.body;
+        const post = await Post.findById(postId);
+        return res.status(200).json({ success: true, payload: post });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });
