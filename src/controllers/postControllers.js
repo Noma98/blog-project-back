@@ -24,7 +24,7 @@ export const postCreate = async (req, res) => {
         return res.json({ success: false });
     }
 }
-export const postRead = async (req, res) => {
+export const postsRead = async (req, res) => {
     try {
         const { folderId } = req.body;
         const posts = await Post.find({ folder: folderId });
@@ -54,6 +54,31 @@ export const postDetail = async (req, res) => {
         const { postId } = req.body;
         const post = await Post.findById(postId);
         return res.status(200).json({ success: true, payload: post });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+export const postUpdate = async (req, res) => {
+    try {
+        const { postId, title, description, selectedFolder, tags, prevFolderId } = req.body;
+
+        await Post.findByIdAndUpdate(postId, {
+            title,
+            description,
+            folder: selectedFolder,
+            tags: Post.makeTags(tags)
+        });
+        //이전 폴더에서 삭제
+        const prevFolder = await Folder.findById(prevFolderId);
+        prevFolder.posts = prevFolder.posts.filter(post => post !== postId);
+        await prevFolder.save();
+        //새로 선택된 폴더에 추가
+        const newFolder = await Folder.findById(selectedFolder);
+        newFolder.posts.push(postId);
+        await newFolder.save();
+
+        return res.status(200).json({ success: true });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });
