@@ -84,3 +84,13 @@ export const postUpdate = async (req, res) => {
         return res.json({ success: false });
     }
 }
+export const postReadAll = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
+        return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
