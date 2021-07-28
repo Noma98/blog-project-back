@@ -104,3 +104,23 @@ export const postLatest = async (req, res) => {
         return res.json({ success: false });
     }
 }
+export const postSearch = async (req, res) => {
+    try {
+        const { query, userId } = req.body;
+        const regex = new RegExp(query, "i");
+        const result = await Post
+            .find({
+                author: userId
+            })
+            .or([
+                { title: { $regex: regex } },
+                { description: { $regex: regex } },
+                { tags: { $elemMatch: { name: { $regex: regex } } } }
+            ])
+            .sort({ createdAt: -1 });
+        return res.status(200).json({ success: true, payload: result });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
