@@ -4,7 +4,7 @@ import Post from '../models/Post.js'
 export const postCreate = async (req, res) => {
     try {
         const user = req.user;
-        const { title, description, tags, selectedFolder: folderId } = req.body;
+        const { title, description, tagArray, selectedFolder: folderId } = req.body;
         const createdAt = Date.now();
         await Post.create({
             title: title || "제목 없음",
@@ -12,7 +12,7 @@ export const postCreate = async (req, res) => {
             author: user._id,
             folder: folderId,
             createdAt,
-            tags: Post.makeTags(tags),
+            tags: tagArray,
         });
         const newPost = await Post.findOne({ author: user._id, createdAt });
         const folder = await Folder.findById(folderId);
@@ -61,13 +61,13 @@ export const postDetail = async (req, res) => {
 }
 export const postUpdate = async (req, res) => {
     try {
-        const { postId, title, description, selectedFolder, tags, prevFolderId } = req.body;
+        const { postId, title, description, selectedFolder, tagArray, prevFolderId } = req.body;
 
         await Post.findByIdAndUpdate(postId, {
             title,
             description,
             folder: selectedFolder,
-            tags: Post.makeTags(tags)
+            tags: tagArray
         });
         //이전 폴더에서 삭제
         const prevFolder = await Folder.findById(prevFolderId);
