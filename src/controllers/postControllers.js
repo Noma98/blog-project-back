@@ -27,7 +27,7 @@ export const postCreate = async (req, res) => {
 export const postsRead = async (req, res) => {
     try {
         const { folderId } = req.body;
-        const posts = await Post.find({ folder: folderId });
+        const posts = await Post.find({ folder: folderId }).sort({ createdAt: -1 });
         return res.status(200).json({ success: true, payload: posts });
     } catch (err) {
         console.log(err);
@@ -89,6 +89,16 @@ export const postReadAll = async (req, res) => {
         const { userId } = req.body;
         const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
         return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+export const postLatest = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const post = await Post.find({ author: userId }).sort({ createdAt: -1 }).findOne();
+        return res.status(200).json({ success: true, payload: post });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });
