@@ -5,7 +5,7 @@ import config from '../config/config.js';
 
 const userSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
-    pwd: { type: String, required: true, minLength: 6 },
+    pwd: { type: String, minLength: 6 },
     name: { type: String, required: true },
     avatar: { type: String, default: "" },
     blogInfo: {

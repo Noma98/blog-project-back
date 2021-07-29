@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import axios from 'axios';
 
 export const postJoin = async (req, res) => {
     const { email, pwd, name } = req.body;
@@ -88,4 +89,63 @@ export const getAuth = async (req, res) => {
         blogInfo,
         folders
     });
+}
+export const githubLogin = async (req, res) => {
+    try {
+        const { code } = req.body;
+        const tokenRequest = await (await axios.post("https://github.com/login/oauth/access_token",
+            {
+                client_id: process.env.GITHUB_DEV_CLIENT,
+                client_secret: process.env.GITHUB_DEV_SECRET,
+                code,
+            }, {
+            headers: {
+                accept: 'application/json'
+            }
+        })).data;
+        if (!"access_token" in tokenRequest) {
+            return res.json({ success: false, message: "액세스 토큰이 없습니다." })
+        }
+        const token = tokenRequest.access_token;
+        //토큰 이용해서 유저 데이터 받아오기
+        const emailData = await (await axios.get("https://api.github.com/user/emails", {
+            headers: {
+                Authorization: `token ${token}`
+            }
+        })).data;
+        const userData = await (await axios.get("https://api.github.com/user", {
+            headers: {
+                Authorization: `token ${token}`
+            }
+        })).data;
+        const email = emailData.find(x => x.primary && x.verified).email;
+        const { name, avatar_url: avatar } = userData;
+
+        //이미 회원가입 된 email인지 체크
+        let user = await User.findOne({ email });
+        //없으면 회원가입 Go!
+        if (!user) {
+            await User.create({
+                email,
+                name,
+                avatar
+            });
+            user = await User.findOne({ email });
+        }
+        //있는 email이면 로그인 Go! JWT 토큰 생성!
+        const jwt = User.generateToken(user);
+        user.token = jwt;
+        await user.save();
+        return res
+            .status(200)
+            .cookie("x_auth", jwt, {
+                httpOnly: true,
+                secure: true,
+                maxAge: 1000 * 60 * 60 * 24
+            })
+            .json({ success: true, message: "로그인 성공" })
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: "로그인 실패" });
+    }
 }
