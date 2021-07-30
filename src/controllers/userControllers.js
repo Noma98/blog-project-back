@@ -149,3 +149,53 @@ export const githubLogin = async (req, res) => {
         return res.json({ success: false, message: "로그인 실패" });
     }
 }
+export const kakaoLogin = async (req, res) => {
+    try {
+        const { code } = req.body;
+        const response = await axios.post(`https://kauth.kakao.com/oauth/token?code=${code}&grant_type=authorization_code&client_id=${process.env.KAKAO_API_KEY}&redirect_uri=http://localhost:3000/oauth/callback/kakao`);
+        const access_token = response.data.access_token;
+        const userData = await axios.get("https://kapi.kakao.com/v2/user/me", {
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        });
+        const {
+            profile: {
+                nickname: name,
+                profile_image_url: avatar
+            },
+            email,
+            is_email_verified: isEmailVerified,
+        } = userData.data.kakao_account;
+        if (!email) {
+            return res.json({ success: false, message: "카카오 로그인 실패\n\n이메일 사용에 동의하지 않으면 카카오로 로그인이 불가능합니다." });
+        }
+        if (!isEmailVerified) {
+            return res.json({ success: false, message: "카카오 로그인 실패\n\n이 앱에서는 인증된 이메일만을 활용합니다. 카카오에서 해당 이메일을 인증했는지 확인하세요." })
+        }
+        // 이메일이 이미 회원가입 된 정보면 그냥 로그인 시켜주기, 없으면 생성후 로그인
+        let user = await User.findOne({ email });
+        if (!user) {
+            await User.create({
+                email,
+                avatar,
+                name
+            });
+            user = await User.findOne({ email });
+        }
+        const jwt = User.generateToken(user);
+        user.token = jwt;
+        await user.save();
+        return res
+            .status(200)
+            .cookie("x_auth", jwt, {
+                secure: true,
+                maxAge: 1000 * 60 * 60 * 24
+            })
+            .json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: err.message });
+    }
+
+}
