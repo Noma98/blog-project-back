@@ -226,7 +226,35 @@ export const kakaoLogin = async (req, res) => {
     }
 
 }
-}
+export const kakaoUnlink = async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+        const unlinkedId = await axios({
+            url: 'https://kapi.kakao.com/v1/user/unlink',
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+        if (!unlinkedId.data.id) {
+            return res.json({
+                success: false, error: {
+                    title: "카카오 로그인 연결끊기 실패",
+                    message: "엑세스 토큰이 없거나 기한이 만료됐을 수 있습니다. 로그인 페이지로 돌아가 처음부터 다시 시도해보세요."
+                }
+            })
+        }
+        return res.status(200).json({
+            success: true
+        })
+    } catch (err) {
+        console.log(err);
+        return res.json({
+            success: false,
+            error: {
+                title: "ERROR",
+                message: err.message
+            }
         })
     }
 
