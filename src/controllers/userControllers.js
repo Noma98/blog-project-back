@@ -104,7 +104,12 @@ export const githubLogin = async (req, res) => {
             }
         })).data;
         if (!"access_token" in tokenRequest) {
-            return res.json({ success: false, message: "액세스 토큰이 없습니다." })
+            return res.json({
+                success: false, error: {
+                    title: "ERROR",
+                    message: "액세스 토큰이 없습니다."
+                }
+            })
         }
         const token = tokenRequest.access_token;
         //토큰 이용해서 유저 데이터 받아오기
@@ -143,10 +148,15 @@ export const githubLogin = async (req, res) => {
                 secure: true,
                 maxAge: 1000 * 60 * 60 * 24
             })
-            .json({ success: true, message: "로그인 성공" })
+            .json({ success: true })
     } catch (err) {
         console.log(err);
-        return res.json({ success: false, message: "로그인 실패" });
+        return res.json({
+            success: false, error: {
+                title: "ERROR",
+                message: "로그인 실패"
+            }
+        });
     }
 }
 export const kakaoLogin = async (req, res) => {
@@ -168,10 +178,22 @@ export const kakaoLogin = async (req, res) => {
             is_email_verified: isEmailVerified,
         } = userData.data.kakao_account;
         if (!email) {
-            return res.json({ success: false, message: "카카오 로그인 실패\n\n이메일 사용에 동의하지 않으면 카카오로 로그인이 불가능합니다." });
+            return res.json({
+                success: false,
+                token: access_token,
+                error: {
+                    title: "카카오 로그인 실패", message: "이메일 사용에 동의하지 않으면 로그인이 불가능합니다."
+                }
+            });
         }
         if (!isEmailVerified) {
-            return res.json({ success: false, message: "카카오 로그인 실패\n\n이 앱에서는 인증된 이메일만을 활용합니다. 카카오에서 해당 이메일을 인증했는지 확인하세요." })
+            return res.json({
+                success: false,
+                token: access_token,
+                error: {
+                    title: "카카오 로그인 실패", message: "이 앱에서는 인증된 이메일만을 활용합니다.\n 카카오에서 해당 이메일을 인증했는지 확인하세요."
+                }
+            })
         }
         // 이메일이 이미 회원가입 된 정보면 그냥 로그인 시켜주기, 없으면 생성후 로그인
         let user = await User.findOne({ email });
@@ -195,7 +217,17 @@ export const kakaoLogin = async (req, res) => {
             .json({ success: true });
     } catch (err) {
         console.log(err);
-        return res.json({ success: false, message: err.message });
+        return res.json({
+            success: false, error: {
+                title: "ERROR",
+                message: err.message
+            }
+        });
+    }
+
+}
+}
+        })
     }
 
 }
