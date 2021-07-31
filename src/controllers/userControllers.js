@@ -259,3 +259,35 @@ export const kakaoUnlink = async (req, res) => {
     }
 
 }
+export const googleLogin = async (req, res) => {
+    try {
+        const { email, name, avatar } = req.body;
+        let user = await User.findOne({ email });
+        if (!user) {
+            await User.create({
+                email,
+                name,
+                avatar
+            });
+            user = await User.findOne({ email });
+        }
+        const jwt = User.generateToken(user);
+        user.token = jwt;
+        await user.save();
+        return res
+            .status(200)
+            .cookie("x_auth", jwt, {
+                maxAge: 1000 * 60 * 60 * 24,
+                secure: true
+            })
+            .json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({
+            success: false, error: {
+                title: "ERROR",
+                message: err.message
+            }
+        })
+    }
+}
