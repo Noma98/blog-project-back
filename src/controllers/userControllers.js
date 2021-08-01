@@ -291,3 +291,48 @@ export const googleLogin = async (req, res) => {
         })
     }
 }
+export const naverLogin = async (req, res) => {
+    const { token } = req.body;
+    try {
+        const response = await axios({
+            method: "GET",
+            url: 'https://openapi.naver.com/v1/nid/me',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const { name, profile_image: avatar, email } = response.data.response;
+        let user = await User.findOne({ email });
+        if (!user) {
+            await User.create({
+                email,
+                name,
+                avatar
+            });
+            user = await User.findOne({ email });
+        }
+        const jwt = User.generateToken(user);
+        user.token = jwt;
+        await user.save();
+        return res
+            .status(200)
+            .cookie("x_auth", jwt, {
+                maxAge: 1000 * 60 * 60 * 24,
+                secure: true
+            })
+            .json({ success: true });
+
+    } catch (err) {
+        console.log(err);
+        return res.json({
+            success: false,
+            token,
+            error: {
+                title: "ERROR",
+                message: err.message
+            }
+        })
+    }
+
+
+}

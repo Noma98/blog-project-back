@@ -1,5 +1,5 @@
 import express from 'express';
-import { postJoin, postLogin, getLogout, getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin } from '../../controllers/userControllers.js';
+import { postJoin, postLogin, getLogout, getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin } from '../../controllers/userControllers.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
 const userRouter = express.Router();
@@ -10,6 +10,7 @@ userRouter.post("/github", githubLogin);
 userRouter.post("/kakao", kakaoLogin);
 userRouter.post("/kakao/unlink", kakaoUnlink);
 userRouter.post("/google", googleLogin);
+userRouter.post("/naver", naverLogin);
 userRouter.get("/logout", authMiddleware, getLogout);
 userRouter.get("/auth", authMiddleware, getAuth);
 
