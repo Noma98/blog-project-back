@@ -336,3 +336,30 @@ export const naverLogin = async (req, res) => {
 
 
 }
+export const naverUnlink = async (req, res) => {
+    const { token } = req.body;
+    try {
+        await axios({
+            method: "GET",
+            baseURL: "https://nid.naver.com/oauth2.0/token",
+            params: {
+                client_id: process.env.NAVER_CLIENT,
+                client_secret: process.env.NAVER_SECRET,
+                access_token: token,
+                grant_type: 'delete',
+                service_provider: "NAVER"
+            }
+        });
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({
+            success: false,
+            token,
+            error: {
+                title: "ERROR",
+                message: err.message
+            }
+        })
+    }
+}
