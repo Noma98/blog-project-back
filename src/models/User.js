@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     avatar: { type: String, default: "" },
     blogInfo: {
         name: { type: String, default: "blog name", maxLength: 15 },
+        introduction: { type: String, default: "🧚‍♀️ : 안녕하세요, 관리자 노마입니다🖐. 나만의 공간을 잘 표현할 수 있는 문구로 소개글을 수정해보세요!" }
     },
     folders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Folder" }],
     token: { type: String, default: "" }

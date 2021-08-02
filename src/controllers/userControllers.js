@@ -51,6 +51,21 @@ export const postUpdatePwd = async (req, res) => {
         return res.json({ success: false, message: err.message });
     }
 }
+export const postUpdateBlogInfo = async (req, res) => {
+    try {
+        const { userId, introduction, name } = req.body;
+        await User.findByIdAndUpdate(userId, {
+            blogInfo: {
+                introduction,
+                name
+            }
+        })
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: err.message });
+    }
+}
 export const postLogin = async (req, res) => {
     try {
         const { email, pwd } = req.body;
