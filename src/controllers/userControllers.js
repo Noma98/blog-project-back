@@ -14,11 +14,42 @@ export const postJoin = async (req, res) => {
         email,
         pwd,
         name,
+        socialOnly: false
     });
     return res.status(201).json({
         success: true,
         message: "회원가입 완료"
     });
+}
+export const postUpdateUser = async (req, res) => {
+    try {
+        const { userId, name } = req.body;
+        if (userId && name) {
+            await User.findByIdAndUpdate(userId, { name });
+            return res.status(200).json({ success: true });
+        } else {
+            return res.json({ success: false, message: "이름을 입력하세요." })
+        }
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: err.message });
+    }
+}
+export const postUpdatePwd = async (req, res) => {
+    try {
+        const { pwd, newPwd, userId } = req.body;
+        const user = await User.findById(userId);
+        const match = await User.verifyPwd(pwd, user.pwd);
+        if (!match) {
+            return res.json({ success: false, message: "현재 비밀번호가 틀립니다." })
+        }
+        user.pwd = newPwd;
+        await user.save();
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: err.message });
+    }
 }
 export const postLogin = async (req, res) => {
     try {
@@ -78,7 +109,7 @@ export const getLogout = async (req, res) => {
 export const getAuth = async (req, res) => {
     //여기는 인증 된 유저만.
     //req에 token과 user가 있다.
-    const { _id, name, email, avatar, blogInfo, folders } = req.user;
+    const { _id, name, email, avatar, blogInfo, folders, socialOnly } = req.user;
     return res.status(200).json({
         success: true,
         isAuth: true,
@@ -87,7 +118,8 @@ export const getAuth = async (req, res) => {
         email,
         avatar,
         blogInfo,
-        folders
+        folders,
+        socialOnly
     });
 }
 export const githubLogin = async (req, res) => {

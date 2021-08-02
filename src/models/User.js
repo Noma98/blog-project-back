@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 
 const userSchema = new mongoose.Schema({
+    socialOnly: { type: Boolean, default: true, required: true },
     email: { type: String, unique: true, required: true },
     pwd: { type: String, minLength: 6 },
     name: { type: String, required: true },
