@@ -161,6 +161,7 @@ export const githubLogin = async (req, res) => {
 }
 export const kakaoLogin = async (req, res) => {
     try {
+        //동의 취소 없음, 필수 요소 체크 해제 불가능
         const { code } = req.body;
         const response = await axios.post(`https://kauth.kakao.com/oauth/token?code=${code}&grant_type=authorization_code&client_id=${process.env.KAKAO_API_KEY}&redirect_uri=http://localhost:3000/oauth/callback/kakao`);
         const access_token = response.data.access_token;
@@ -302,6 +303,18 @@ export const naverLogin = async (req, res) => {
             }
         });
         const { name, profile_image: avatar, email } = response.data.response;
+        //네이버는 동의 필수 요소도 체크 안하고 다음 단계로 넘어갈 수 있기 때문에 전부다 체크 되지 않으면 에러메시지 전달하도록 처리
+        if (!(name && avatar && email)) {
+            return res.json({
+                success: false,
+                token,
+                error: {
+                    title: "네이버 로그인 실패",
+                    message: "정보 제공 필수 요소에 대해 모두 동의하지 않으면, 네이버로 로그인 및 회원가입 진행이 불가합니다."
+                }
+            })
+        }
+
         let user = await User.findOne({ email });
         if (!user) {
             await User.create({
