@@ -1,4 +1,6 @@
 import User from '../models/User.js';
+import Folder from '../models/Folder.js';
+import Post from '../models/Post.js';
 import axios from 'axios';
 
 export const postJoin = async (req, res) => {
@@ -64,6 +66,23 @@ export const postUpdateBlogInfo = async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.json({ success: false, message: err.message });
+    }
+}
+export const postDelete = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        await Folder.deleteMany({ owner: userId });
+        await Post.deleteMany({ author: userId });
+        await User.findByIdAndRemove(userId);
+        return res.status(200).json({
+            success: true
+        })
+    } catch (err) {
+        console.log(err);
+        return res.json({
+            success: false,
+            message: err.message
+        })
     }
 }
 export const postLogin = async (req, res) => {

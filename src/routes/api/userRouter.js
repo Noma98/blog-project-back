@@ -1,5 +1,5 @@
 import express from 'express';
-import { postJoin, postLogin, getLogout, getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, postUpdatePwd, postUpdateUser, postUpdateBlogInfo } from '../../controllers/userControllers.js';
+import { postJoin, postLogin, getLogout, getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, postUpdatePwd, postUpdateUser, postUpdateBlogInfo, postDelete } from '../../controllers/userControllers.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 
 const userRouter = express.Router();
@@ -11,6 +11,7 @@ userRouter.get("/logout", authMiddleware, getLogout);
 userRouter.post("/update", postUpdateUser);
 userRouter.post("/update/password", postUpdatePwd);
 userRouter.post("/update/blog", postUpdateBlogInfo);
+userRouter.post("/delete", postDelete);
 
 userRouter.post("/github", githubLogin);
 
