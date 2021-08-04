@@ -1,6 +1,7 @@
 import express from 'express';
 import { postJoin, postLogin, getLogout, getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, postUpdatePwd, postUpdateUser, postUpdateBlogInfo, postDelete } from '../../controllers/userControllers.js';
 import { authMiddleware } from '../../middlewares/auth.js';
+import { imgUpload } from '../../middlewares/upload.js';
 
 const userRouter = express.Router();
 
@@ -8,7 +9,7 @@ userRouter.post("/join", postJoin);
 userRouter.post("/login", postLogin);
 userRouter.get("/logout", authMiddleware, getLogout);
 
-userRouter.post("/update", postUpdateUser);
+userRouter.post("/update", imgUpload.single("avatar"), postUpdateUser);
 userRouter.post("/update/password", postUpdatePwd);
 userRouter.post("/update/blog", postUpdateBlogInfo);
 userRouter.post("/delete", postDelete);

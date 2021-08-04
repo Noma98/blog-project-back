@@ -16,6 +16,8 @@ app.use("/api/users", userRouter);
 app.use("/api/folders", folderRouter);
 app.use("/api/posts", postRouter);
 
+app.use("/uploads", express.static("uploads"));
+
 export default app;
 
 

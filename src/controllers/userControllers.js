@@ -25,9 +25,10 @@ export const postJoin = async (req, res) => {
 }
 export const postUpdateUser = async (req, res) => {
     try {
+        const path = req.file?.path;
         const { userId, name } = req.body;
-        if (userId && name) {
-            await User.findByIdAndUpdate(userId, { name });
+        if (name) {
+            await User.findByIdAndUpdate(userId, { name, avatar: path ? `http://localhost:4000/${path}` : "" });
             return res.status(200).json({ success: true });
         } else {
             return res.json({ success: false, message: "이름을 입력하세요." })
