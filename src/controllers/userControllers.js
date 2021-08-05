@@ -3,7 +3,7 @@ import Folder from '../models/Folder.js';
 import Post from '../models/Post.js';
 import axios from 'axios';
 
-export const postJoin = async (req, res) => {
+export const join = async (req, res) => {
     const { email, pwd, name } = req.body;
     const user = await User.findOne({ email });
     if (user) {
@@ -23,7 +23,7 @@ export const postJoin = async (req, res) => {
         message: "회원가입 완료"
     });
 }
-export const postUpdateUser = async (req, res) => {
+export const updateUserInfo = async (req, res) => {
     try {
         const path = req.file?.path;
         const { userId, name } = req.body;
@@ -38,7 +38,7 @@ export const postUpdateUser = async (req, res) => {
         return res.json({ success: false, message: err.message });
     }
 }
-export const postUpdatePwd = async (req, res) => {
+export const updateUserPwd = async (req, res) => {
     try {
         const { pwd, newPwd, userId } = req.body;
         const user = await User.findById(userId);
@@ -54,7 +54,7 @@ export const postUpdatePwd = async (req, res) => {
         return res.json({ success: false, message: err.message });
     }
 }
-export const postUpdateBlogInfo = async (req, res) => {
+export const updateBlogInfo = async (req, res) => {
     try {
         const { userId, introduction, name } = req.body;
         await User.findByIdAndUpdate(userId, {
@@ -69,7 +69,7 @@ export const postUpdateBlogInfo = async (req, res) => {
         return res.json({ success: false, message: err.message });
     }
 }
-export const postDelete = async (req, res) => {
+export const deleteUser = async (req, res) => {
     try {
         const { userId } = req.body;
         await Folder.deleteMany({ owner: userId });
@@ -86,7 +86,7 @@ export const postDelete = async (req, res) => {
         })
     }
 }
-export const postLogin = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, pwd } = req.body;
         const user = await User.findOne({ email });
@@ -122,7 +122,7 @@ export const postLogin = async (req, res) => {
         })
     }
 }
-export const getLogout = async (req, res) => {
+export const logout = async (req, res) => {
     //로그인을 했었다면 auth 미들웨어를 거치면서 req에 토큰과 유저 정보를 받아서 온다.
     try {
         await User.findOneAndUpdate({ _id: req.user._id }, {

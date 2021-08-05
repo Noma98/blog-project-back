@@ -1,7 +1,7 @@
 import Folder from '../models/Folder.js';
 import Post from '../models/Post.js'
 
-export const postCreate = async (req, res) => {
+export const createPost = async (req, res) => {
     try {
         const user = req.user;
         const { title, description, tagArray, selectedFolder: folderId } = req.body;
@@ -24,18 +24,8 @@ export const postCreate = async (req, res) => {
         return res.json({ success: false });
     }
 }
-export const postsRead = async (req, res) => {
-    try {
-        const { folderId } = req.body;
-        const posts = await Post.find({ folder: folderId }).sort({ createdAt: -1 });
-        return res.status(200).json({ success: true, payload: posts });
-    } catch (err) {
-        console.log(err);
-        return res.json({ success: false });
-    }
 
-}
-export const postDelete = async (req, res) => {
+export const deletePost = async (req, res) => {
     try {
         const { postId, folderId } = req.body;
         await Post.findByIdAndRemove(postId);
@@ -49,17 +39,8 @@ export const postDelete = async (req, res) => {
         return res.json({ success: false });
     }
 }
-export const postDetail = async (req, res) => {
-    try {
-        const { postId } = req.body;
-        const post = await Post.findById(postId);
-        return res.status(200).json({ success: true, payload: post });
-    } catch (err) {
-        console.log(err);
-        return res.json({ success: false });
-    }
-}
-export const postUpdate = async (req, res) => {
+
+export const updatePost = async (req, res) => {
     try {
         const { postId, title, description, selectedFolder, tagArray, prevFolderId } = req.body;
 
@@ -69,22 +50,47 @@ export const postUpdate = async (req, res) => {
             folder: selectedFolder,
             tags: tagArray
         });
-        //이전 폴더에서 삭제
-        const prevFolder = await Folder.findById(prevFolderId);
-        prevFolder.posts = prevFolder.posts.filter(post => post !== postId);
-        await prevFolder.save();
-        //새로 선택된 폴더에 추가
-        const newFolder = await Folder.findById(selectedFolder);
-        newFolder.posts.push(postId);
-        await newFolder.save();
-
+        if (prevFolderId !== selectedFolder) {
+            //이전 폴더에서 삭제
+            const prevFolder = await Folder.findById(prevFolderId);
+            prevFolder.posts = prevFolder.posts.filter(post => post !== postId);
+            await prevFolder.save();
+            //새로 선택된 폴더에 추가
+            const newFolder = await Folder.findById(selectedFolder);
+            newFolder.posts.push(postId);
+            await newFolder.save();
+        }
         return res.status(200).json({ success: true });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });
     }
 }
-export const postReadAll = async (req, res) => {
+
+export const findPostsByFolderId = async (req, res) => {
+    try {
+        const { folderId } = req.body;
+        const posts = await Post.find({ folder: folderId }).sort({ createdAt: -1 });
+        return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+
+}
+
+export const findPostByPostId = async (req, res) => {
+    try {
+        const { postId } = req.body;
+        const post = await Post.findById(postId);
+        return res.status(200).json({ success: true, payload: post });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+
+export const findPostsByUserId = async (req, res) => {
     try {
         const { userId } = req.body;
         const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
@@ -94,17 +100,8 @@ export const postReadAll = async (req, res) => {
         return res.json({ success: false });
     }
 }
-export const postLatest = async (req, res) => {
-    try {
-        const { userId } = req.body;
-        const post = await Post.find({ author: userId }).sort({ createdAt: -1 }).findOne();
-        return res.status(200).json({ success: true, payload: post });
-    } catch (err) {
-        console.log(err);
-        return res.json({ success: false });
-    }
-}
-export const postSearch = async (req, res) => {
+
+export const findPostsByQuery = async (req, res) => {
     try {
         const { query, userId } = req.body;
         const regex = new RegExp(query, "i");
@@ -119,6 +116,17 @@ export const postSearch = async (req, res) => {
             ])
             .sort({ createdAt: -1 });
         return res.status(200).json({ success: true, payload: result });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+
+export const findLatestPost = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const post = await Post.find({ author: userId }).sort({ createdAt: -1 }).findOne();
+        return res.status(200).json({ success: true, payload: post });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });

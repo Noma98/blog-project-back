@@ -1,6 +1,6 @@
 import Folder from '../models/Folder.js'
 
-export const getCreate = async (req, res) => {
+export const createFolder = async (req, res) => {
     const user = req.user;
     const name = `Sample Folder_${user.folders.length}`;
     try {
@@ -17,7 +17,7 @@ export const getCreate = async (req, res) => {
         res.json({ success: false });
     }
 }
-export const postEdit = async (req, res) => {
+export const updateFolderName = async (req, res) => {
     try {
         const { folderId, newName } = req.body;
         await Folder.findByIdAndUpdate(folderId, {
@@ -31,7 +31,7 @@ export const postEdit = async (req, res) => {
         return res.json({ success: false });
     }
 }
-export const postDelete = async (req, res) => {
+export const deleteFolder = async (req, res) => {
     try {
         const user = req.user;
         const { folderId } = req.body;

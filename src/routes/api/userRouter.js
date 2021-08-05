@@ -1,18 +1,18 @@
 import express from 'express';
-import { postJoin, postLogin, getLogout, getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, postUpdatePwd, postUpdateUser, postUpdateBlogInfo, postDelete } from '../../controllers/userControllers.js';
+import { getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, updateUserPwd, updateUserInfo, updateBlogInfo, deleteUser, login, logout, join } from '../../controllers/userControllers.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import { imgUpload } from '../../middlewares/upload.js';
 
 const userRouter = express.Router();
 
-userRouter.post("/join", postJoin);
-userRouter.post("/login", postLogin);
-userRouter.get("/logout", authMiddleware, getLogout);
+userRouter.post("/join", join);
+userRouter.post("/login", login);
+userRouter.get("/logout", authMiddleware, logout);
 
-userRouter.post("/update", imgUpload.single("avatar"), postUpdateUser);
-userRouter.post("/update/password", postUpdatePwd);
-userRouter.post("/update/blog", postUpdateBlogInfo);
-userRouter.post("/delete", postDelete);
+userRouter.post("/update", imgUpload.single("avatar"), updateUserInfo);
+userRouter.post("/update/password", updateUserPwd);
+userRouter.post("/update/blog", updateBlogInfo);
+userRouter.post("/delete", deleteUser);
 
 userRouter.post("/github", githubLogin);
 
