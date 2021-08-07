@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, updateUserPwd, updateUserInfo, updateBlogInfo, deleteUser, login, logout, join } from '../../controllers/userControllers.js';
+import { getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, updateUserPwd, updateUserInfo, updateBlogInfo, deleteUser, login, logout, join, getPublicUser } from '../../controllers/userControllers.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import { imgUpload } from '../../middlewares/upload.js';
 
@@ -25,5 +25,5 @@ userRouter.post("/naver", naverLogin);
 userRouter.post("/naver/unlink", naverUnlink);
 
 userRouter.get("/auth", authMiddleware, getAuth);
-
+userRouter.post("/public", getPublicUser);
 export default userRouter;

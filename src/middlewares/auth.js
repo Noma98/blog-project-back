@@ -10,9 +10,7 @@ export const authMiddleware = async (req, res, next) => {
     const user = await User.findByToken(token);
     if (!user) {
         return res.json({
-            success: false,
-            isAuth: false,
-            _id: null,
+            success: false
         });
     }
     req.token = token;

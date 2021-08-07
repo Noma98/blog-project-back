@@ -141,20 +141,28 @@ export const logout = async (req, res) => {
         return res.json({ success: false, message: err.message });
     }
 }
+export const getPublicUser = async (req, res) => {
+    const { nickname } = req.body;
+    const user = await User.findOne({ name: nickname }).populate("folders");
+    if (!user) {
+        return res.json({ success: false });
+    }
+    const { _id, name, email, avatar, blogInfo, folders, socialOnly } = user;
+    return res.json({
+        success: true,
+        payload: { _id, name, email, avatar, blogInfo, folders, socialOnly }
+    });
+}
 export const getAuth = async (req, res) => {
     //여기는 인증 된 유저만.
     //req에 token과 user가 있다.
-    const { _id, name, email, avatar, blogInfo, folders, socialOnly } = req.user;
+    const { _id, name } = req.user;
     return res.status(200).json({
         success: true,
-        isAuth: true,
-        _id,
-        name,
-        email,
-        avatar,
-        blogInfo,
-        folders,
-        socialOnly
+        payload: {
+            _id,
+            name
+        }
     });
 }
 export const githubLogin = async (req, res) => {
