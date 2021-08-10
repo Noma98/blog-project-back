@@ -5,17 +5,27 @@ import axios from 'axios';
 
 export const join = async (req, res) => {
     const { email, pwd, name } = req.body;
-    const user = await User.findOne({ email });
-    if (user) {
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
         return res.json({
             success: false,
             message: "이미 사용 중인 이메일입니다."
         });
     }
+    const nameExists = await User.findOne({ name });
+    if (nameExists) {
+        return res.json({
+            success: false,
+            message: "이미 사용 중인 닉네임입니다."
+        });
+    }
     await User.create({
         email,
         pwd,
-        name,
+        name: name.toLowerCase().replaceAll(" ", ""),
+        blogInfo: {
+            name: `${name}'s blog`
+        },
         socialOnly: false
     });
     return res.status(201).json({
@@ -165,6 +175,26 @@ export const getAuth = async (req, res) => {
         }
     });
 }
+export const socialJoin = async (req, res) => {
+    try {
+        let { email, name, avatar } = req.body;
+        name = name.toLowerCase().replaceAll(" ", "");
+        const nameExists = await User.findOne({ name });
+        if (nameExists) {
+            return res.json({ success: false, message: "이미 사용중인 닉네임입니다." });
+        }
+        await User.create({
+            email,
+            name,
+            avatar,
+            blogInfo: { name: `${name}'s blog` }
+        });
+        return res.status(201).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false, message: "소셜 가입 실패" });
+    }
+}
 export const githubLogin = async (req, res) => {
     try {
         const { code } = req.body;
@@ -199,17 +229,19 @@ export const githubLogin = async (req, res) => {
             }
         })).data;
         const email = emailData.find(x => x.primary && x.verified).email;
-        const { name, avatar_url: avatar } = userData;
-
+        let { name, avatar_url: avatar } = userData;
+        name = name.toLowerCase().replaceAll(" ", "");
         //이미 회원가입 된 email인지 체크
         let user = await User.findOne({ email });
         //없으면 회원가입 Go!
         if (!user) {
+            const nameExists = await User.findOne({ name });
+            if (nameExists || name.match(/\W/)) {
+                return res.status(200).json({ success: "join", payload: { email, name, avatar } });
+            };
             await User.create({
-                email,
-                name,
-                avatar
-            });
+                email, name, avatar, blogInfo: { name: `${name}'s blog` }
+            })
             user = await User.findOne({ email });
         }
         //있는 email이면 로그인 Go! JWT 토큰 생성!
@@ -223,13 +255,13 @@ export const githubLogin = async (req, res) => {
                 secure: true,
                 maxAge: 1000 * 60 * 60 * 24
             })
-            .json({ success: true })
+            .json({ success: true, payload: { name: user.name } })
     } catch (err) {
         console.log(err);
         return res.json({
             success: false, error: {
                 title: "ERROR",
-                message: "로그인 실패"
+                message: "깃허브로 로그인 실패"
             }
         });
     }
@@ -245,7 +277,7 @@ export const kakaoLogin = async (req, res) => {
                 Authorization: `Bearer ${access_token}`
             }
         });
-        const {
+        let {
             profile: {
                 nickname: name,
                 profile_image_url: avatar
@@ -253,6 +285,7 @@ export const kakaoLogin = async (req, res) => {
             email,
             is_email_verified: isEmailVerified,
         } = userData.data.kakao_account;
+        name = name.toLowerCase().replaceAll(" ", "");
         if (!email) {
             return res.json({
                 success: false,
@@ -274,10 +307,12 @@ export const kakaoLogin = async (req, res) => {
         // 이메일이 이미 회원가입 된 정보면 그냥 로그인 시켜주기, 없으면 생성후 로그인
         let user = await User.findOne({ email });
         if (!user) {
+            const nameExists = await User.findOne({ name });
+            if (nameExists || name.match(/\W/)) {
+                return res.status(200).json({ success: "join", payload: { email, name, avatar } });
+            }
             await User.create({
-                email,
-                avatar,
-                name
+                email, avatar, name, blogInfo: { name: `${name}'s blog` }
             });
             user = await User.findOne({ email });
         }
@@ -290,13 +325,14 @@ export const kakaoLogin = async (req, res) => {
                 secure: true,
                 maxAge: 1000 * 60 * 60 * 24
             })
-            .json({ success: true });
+            .json({ success: true, payload: { name: user.name } });
     } catch (err) {
         console.log(err);
         return res.json({
-            success: false, error: {
+            success: false,
+            error: {
                 title: "ERROR",
-                message: err.message
+                message: "카카오로 로그인하기 실패"
             }
         });
     }
@@ -337,13 +373,16 @@ export const kakaoUnlink = async (req, res) => {
 }
 export const googleLogin = async (req, res) => {
     try {
-        const { email, name, avatar } = req.body;
+        let { email, name, avatar } = req.body;
+        name = name.toLowerCase().replaceAll(" ", "");
         let user = await User.findOne({ email });
         if (!user) {
+            const nameExists = await User.findOne({ name });
+            if (nameExists || name.match(/\W/)) {
+                return res.status(200).json({ success: "join", payload: { name, email, avatar } });
+            }
             await User.create({
-                email,
-                name,
-                avatar
+                email, name, avatar, blogInfo: { name: `${name}'s blog` }
             });
             user = await User.findOne({ email });
         }
@@ -356,7 +395,7 @@ export const googleLogin = async (req, res) => {
                 maxAge: 1000 * 60 * 60 * 24,
                 secure: true
             })
-            .json({ success: true });
+            .json({ success: true, payload: { name: user.name } });
     } catch (err) {
         console.log(err);
         return res.json({
@@ -377,7 +416,7 @@ export const naverLogin = async (req, res) => {
                 'Authorization': `Bearer ${token}`
             }
         });
-        const { name, profile_image: avatar, email } = response.data.response;
+        let { nickname: name, profile_image: avatar, email } = response.data.response;
         //네이버는 동의 필수 요소도 체크 안하고 다음 단계로 넘어갈 수 있기 때문에 전부다 체크 되지 않으면 에러메시지 전달하도록 처리
         if (!(name && avatar && email)) {
             return res.json({
@@ -389,13 +428,15 @@ export const naverLogin = async (req, res) => {
                 }
             })
         }
-
+        name = name.toLowerCase().replaceAll(" ", "");
         let user = await User.findOne({ email });
         if (!user) {
+            const nameExists = await User.findOne({ name });
+            if (nameExists || name.match(/\W/)) {
+                return res.status(200).json({ success: "join", payload: { email, name, avatar } });
+            };
             await User.create({
-                email,
-                name,
-                avatar
+                email, name, avatar, blogInfo: { name: `${name}'s blog` }
             });
             user = await User.findOne({ email });
         }
@@ -408,7 +449,7 @@ export const naverLogin = async (req, res) => {
                 maxAge: 1000 * 60 * 60 * 24,
                 secure: true
             })
-            .json({ success: true });
+            .json({ success: true, payload: { name: user.name } });
 
     } catch (err) {
         console.log(err);

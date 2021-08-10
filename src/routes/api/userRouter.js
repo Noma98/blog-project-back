@@ -1,11 +1,12 @@
 import express from 'express';
-import { getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, updateUserPwd, updateUserInfo, updateBlogInfo, deleteUser, login, logout, join, getPublicUser } from '../../controllers/userControllers.js';
+import { getAuth, githubLogin, kakaoLogin, kakaoUnlink, googleLogin, naverLogin, naverUnlink, updateUserPwd, updateUserInfo, updateBlogInfo, deleteUser, login, logout, join, getPublicUser, socialJoin } from '../../controllers/userControllers.js';
 import { authMiddleware } from '../../middlewares/auth.js';
 import { imgUpload } from '../../middlewares/upload.js';
 
 const userRouter = express.Router();
 
 userRouter.post("/join", join);
+userRouter.post("/join/social", socialJoin);
 userRouter.post("/login", login);
 userRouter.get("/logout", authMiddleware, logout);
 
