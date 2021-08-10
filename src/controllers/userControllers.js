@@ -35,17 +35,29 @@ export const join = async (req, res) => {
 }
 export const updateUserInfo = async (req, res) => {
     try {
-        const path = req.file?.path;
         const { userId, name } = req.body;
-        if (name) {
-            await User.findByIdAndUpdate(userId, { name, avatar: path ? `http://localhost:4000/${path}` : "" });
-            return res.status(200).json({ success: true });
-        } else {
+        const path = req.file?.path;
+        if (!name) {
             return res.json({ success: false, message: "이름을 입력하세요." })
         }
+        const user = await User.findById(userId);
+        if (path) {
+            user.avatar = `http://localhost:4000/${path}`;
+        }
+        if (name !== user.name) {
+            //이름이 이전과 다르다면, 중복여부 검사
+            const nameExists = await User.findOne({ name });
+            if (nameExists || name.match(/\W/)) {
+                return res.json({ success: false, message: "이미 사용중인 닉네임이거나 조건에 맞지 않습니다." })
+            }
+            //중복 안되면,
+            user.name = name.toLowerCase().replaceAll(" ", "");
+        }
+        await user.save();
+        return res.status(200).json({ success: true });
     } catch (err) {
         console.log(err);
-        return res.json({ success: false, message: err.message });
+        return res.json({ success: false, message: "회원 정보 변경 실패" });
     }
 }
 export const updateUserPwd = async (req, res) => {
