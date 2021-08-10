@@ -11,6 +11,7 @@ const postSchema = new mongoose.Schema({
     author: {
         type: mongoose.Types.ObjectId,
         required: true,
+        ref: "User"
     },
     folder: {
         type: mongoose.Types.ObjectId,

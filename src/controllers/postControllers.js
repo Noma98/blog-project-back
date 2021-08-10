@@ -132,3 +132,28 @@ export const findLatestPost = async (req, res) => {
         return res.json({ success: false });
     }
 }
+export const findAllPosts = async (req, res) => {
+    try {
+        const posts = await Post.find({}).populate("author").sort({ createdAt: -1 });
+        return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+export const findAllResults = async (req, res) => {
+    try {
+        const { query } = req.body;
+        const regex = new RegExp(query, "i");
+        const posts = await Post.find().or([
+            { title: { $regex: regex } },
+            { description: { $regex: regex } },
+            { tags: { $elemMatch: { name: { $regex: regex } } } }
+        ]).sort({ createdAt: -1 }).populate("author");
+
+        return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
