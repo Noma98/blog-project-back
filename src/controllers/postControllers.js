@@ -6,15 +6,15 @@ export const createPost = async (req, res) => {
         const user = req.user;
         const { title, description, tagArray, selectedFolder: folderId } = req.body;
         const createdAt = Date.now();
-        await Post.create({
+        const newPost = new Post({
             title: title || "제목 없음",
             description,
             author: user._id,
             folder: folderId,
             createdAt,
             tags: tagArray,
-        });
-        const newPost = await Post.findOne({ author: user._id, createdAt });
+        })
+        await newPost.save();
         const folder = await Folder.findById(folderId);
         folder.posts.push(newPost._id);
         await folder.save();
@@ -76,7 +76,6 @@ export const findPostsByFolderId = async (req, res) => {
         console.log(err);
         return res.json({ success: false });
     }
-
 }
 
 export const findPostByPostId = async (req, res) => {
@@ -134,7 +133,7 @@ export const findLatestPost = async (req, res) => {
 }
 export const findAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find({}).populate("author").sort({ createdAt: -1 });
+        const posts = await Post.find().populate("author").sort({ createdAt: -1 });
         return res.status(200).json({ success: true, payload: posts });
     } catch (err) {
         console.log(err);

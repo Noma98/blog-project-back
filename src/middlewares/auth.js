@@ -13,7 +13,6 @@ export const authMiddleware = async (req, res, next) => {
             success: false
         });
     }
-    req.token = token;
     req.user = user;
     next();
 }
