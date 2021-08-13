@@ -5,7 +5,8 @@ import axios from 'axios';
 import * as common from '../common/common.js';
 
 export const join = async (req, res) => {
-    const { email, pwd, name } = req.body;
+    let { email, pwd, name } = req.body;
+    name = name.toLowerCase().replace(/ /g, "");
     const emailExists = await User.findOne({ email });
     if (emailExists) {
         return res.json({
@@ -30,7 +31,7 @@ export const join = async (req, res) => {
 export const login = async (req, res) => {
     try {
         let { email, pwd } = req.body;
-        email = email.toLowerCase().replaceAll(" ", "");
+        email = email.toLowerCase().replace(/ /g, "");
         const user = await User.findOne({ email });
         if (!user) {
             return res.json({
@@ -92,7 +93,8 @@ export const getAuth = async (req, res) => {
 
 export const socialReJoin = async (req, res) => {
     try {
-        const { email, name, avatar } = req.body;
+        let { email, name, avatar } = req.body;
+        name = name.toLowerCase().replace(/ /g, "");
         const nameExists = await User.findOne({ name });
         if (nameExists) {
             return res.json({ success: false, message: "이미 사용중인 닉네임입니다." });
@@ -326,7 +328,7 @@ export const updateUserInfo = async (req, res) => {
                 return res.json({ success: false, message: "이미 사용 중인 닉네임이거나 조건에 맞지 않습니다." })
             }
             //중복 안되면,
-            user.name = name.toLowerCase().replaceAll(" ", "");
+            user.name = name.toLowerCase().replace(/ /g, "");
         }
         await user.save();
         return res.status(200).json({ success: true });

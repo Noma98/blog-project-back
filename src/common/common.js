@@ -4,7 +4,7 @@ export const createUser = async (data, socialOnly) => {
     const { email, pwd, name, avatar } = data;
     await User.create({
         email,
-        name: name.toLowerCase().replaceAll(" ", ""),
+        name,
         blogInfo: {
             name: `${name}'s blog`
         },
@@ -15,7 +15,7 @@ export const createUser = async (data, socialOnly) => {
 }
 export const socialJoinAndLogin = async (data, res) => {
     let { email, name, avatar } = data;
-    name = name.toLowerCase().replaceAll(" ", "");
+    name = name.toLowerCase().replace(/ /g, "");
 
     //이미 가입된 email인지 체크
     let user = await User.findOne({ email });
@@ -28,7 +28,7 @@ export const socialJoinAndLogin = async (data, res) => {
         };
         user = new User({
             email,
-            name: name.toLowerCase().replaceAll(" ", ""),
+            name: name.toLowerCase().replace(/ /g, ""),
             blogInfo: {
                 name: `${name}'s blog`
             },
