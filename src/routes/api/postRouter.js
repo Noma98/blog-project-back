@@ -5,8 +5,8 @@ import { authMiddleware } from '../../middlewares/auth.js';
 const postRouter = express.Router();
 
 postRouter.post("/create", authMiddleware, createPost);
-postRouter.post("/delete", deletePost);
-postRouter.post("/update", updatePost);
+postRouter.post("/delete", authMiddleware, deletePost);
+postRouter.post("/update", authMiddleware, updatePost);
 postRouter.post("/read", findPostsByFolderId);
 postRouter.post("/detail", findPostByPostId);
 postRouter.post("/user", findPostsByUserId);

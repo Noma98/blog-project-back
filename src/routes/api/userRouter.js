@@ -10,10 +10,10 @@ userRouter.post("/join/social", socialReJoin);
 userRouter.post("/login", login);
 userRouter.get("/logout", authMiddleware, logout);
 
-userRouter.post("/update", imgUpload.single("avatar"), updateUserInfo);
-userRouter.post("/update/password", updateUserPwd);
-userRouter.post("/update/blog", updateBlogInfo);
-userRouter.post("/delete", deleteUser);
+userRouter.post("/update", authMiddleware, imgUpload.single("avatar"), updateUserInfo);
+userRouter.post("/update/password", authMiddleware, updateUserPwd);
+userRouter.post("/update/blog", authMiddleware, updateBlogInfo);
+userRouter.post("/delete", authMiddleware, deleteUser);
 
 userRouter.post("/github", githubLogin);
 

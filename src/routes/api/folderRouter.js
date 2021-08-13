@@ -4,7 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.js';
 
 const folderRouter = express.Router();
 folderRouter.get("/create", authMiddleware, createFolder);
-folderRouter.post("/edit", updateFolderName);
+folderRouter.post("/edit", authMiddleware, updateFolderName);
 folderRouter.post("/delete", authMiddleware, deleteFolder);
 
 export default folderRouter;
