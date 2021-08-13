@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
-import config from './config/config.js';
 
-mongoose.connect(config.mongoUri, {
+mongoose.connect(process.env.MONGO_URI, {
     useCreateIndex: true,
     useFindAndModify: false,
     useNewUrlParser: true,

@@ -110,8 +110,8 @@ export const githubLogin = async (req, res) => {
         const { code } = req.body;
         const tokenRequest = await axios.post("https://github.com/login/oauth/access_token",
             {
-                client_id: process.env.GITHUB_DEV_CLIENT,
-                client_secret: process.env.GITHUB_DEV_SECRET,
+                client_id: process.env.GITHUB_CLIENT,
+                client_secret: process.env.GITHUB_SECRET,
                 code,
             }, {
             headers: {
@@ -150,7 +150,7 @@ export const kakaoLogin = async (req, res) => {
                 code,
                 grant_type: "authorization_code",
                 client_id: process.env.KAKAO_API_KEY,
-                redirect_uri: "http://localhost:3000/oauth/callback/kakao"
+                redirect_uri: process.env.KAKAO_REDIRECT
             }
         })
         const access_token = response.data.access_token;

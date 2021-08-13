@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import config from '../config/config.js';
 
 const userSchema = new mongoose.Schema({
     socialOnly: { type: Boolean, default: true, required: true },
@@ -32,7 +31,7 @@ userSchema.static("generateToken", function (user) {
             _id: user._id,
             name: user.name,
         },
-        config.tokenSecret,
+        process.env.TOKEN_SECRET,
         {
             expiresIn: "7d"
         }
@@ -43,7 +42,7 @@ userSchema.static("findByToken", async function (token) {
         if (!token) {
             return null;
         }
-        const decoded = jwt.verify(token, config.tokenSecret);
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
         const user = await this.findOne({ _id: decoded._id, token }).populate("folders");
         return user;
     } catch (err) {
