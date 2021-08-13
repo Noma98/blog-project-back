@@ -39,7 +39,7 @@ userSchema.static("generateToken", function (user) {
 })
 userSchema.static("findByToken", async function (token) {
     try {
-        if (!token) {
+        if (!token || token === "none") {
             return null;
         }
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
