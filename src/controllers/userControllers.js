@@ -51,7 +51,12 @@ export const login = async (req, res) => {
         await user.save();
         return res
             .status(200)
-            .cookie("x_auth", token, { httpOnly: true, secure: true, maxAge: 1000 * 60 * 60 * 24 })
+            .cookie("x_auth", token, {
+                httpOnly: true,
+                sameSite: 'none',
+                secure: true,
+                maxAge: 1000 * 60 * 60 * 24
+            })
             .json({ success: true });
     } catch (err) {
         console.log(err);
@@ -71,7 +76,8 @@ export const logout = async (req, res) => {
         return res.cookie("x_auth", "none", {
             maxAge: 5000,
             httpOnly: true,
-            secure: true
+            sameSite: 'none',
+            secure: true,
         }).json({ success: true });
     } catch (err) {
         console.log(err);
