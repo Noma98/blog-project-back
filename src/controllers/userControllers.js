@@ -319,13 +319,13 @@ export const naverUnlink = async (req, res) => {
 export const updateUserInfo = async (req, res) => {
     try {
         const { userId, name } = req.body;
-        const path = req.file?.path;
+        const file = req.file;
         if (!name) {
             return res.json({ success: false, message: "이름을 입력하세요." })
         }
         const user = await User.findById(userId);
-        if (path) {
-            user.avatar = `http://localhost:4000/${path}`;
+        if (file) {
+            user.avatar = process.env.NODE_ENV === "production" ? file.location : `http://localhost:4000/${file.path}`;
         }
         if (name !== user.name) {
             //이름이 이전과 다르다면, 중복여부 검사

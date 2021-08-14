@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Noma98/blog-project-back#readme",
   "dependencies": {
     "@babel/runtime": "^7.15.3",
+    "aws-sdk": "^2.968.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.5",
@@ -29,7 +30,8 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.3",
-    "multer": "^1.4.2"
+    "multer": "^1.4.2",
+    "multer-s3": "^2.9.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.8",
