@@ -36,7 +36,7 @@ export const deleteFolder = async (req, res) => {
         const user = req.user;
         const { folderId } = req.body;
         await Folder.findByIdAndRemove(folderId);
-        const updated = user.folders.filter(folder => folder._id !== folderId);
+        const updated = user.folders.filter(folder => String(folder._id) !== String(folderId));
         user.folders = updated;
         await user.save();
         return res.send({ success: true });

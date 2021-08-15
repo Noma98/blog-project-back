@@ -30,7 +30,7 @@ export const deletePost = async (req, res) => {
         const { postId, folderId } = req.body;
         await Post.findByIdAndRemove(postId);
         const folder = await Folder.findById(folderId);
-        const updated = folder.posts.filter(post => post != postId);
+        const updated = folder.posts.filter(post => String(post) !== String(postId));
         folder.posts = updated;
         await folder.save();
         return res.status(200).json({ success: true });
