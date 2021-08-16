@@ -43,8 +43,7 @@ userSchema.static("findByToken", async function (token) {
             return null;
         }
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-        const user = await this.findOne({ _id: decoded._id, token }).populate("folders");
-        return user;
+        return await this.findOne({ _id: decoded._id, token });
     } catch (err) {
         console.log(err);
         return null;

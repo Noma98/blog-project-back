@@ -318,12 +318,12 @@ export const naverUnlink = async (req, res) => {
 
 export const updateUserInfo = async (req, res) => {
     try {
-        const { userId, name } = req.body;
+        const { name } = req.body;
         const file = req.file;
         if (!name) {
             return res.json({ success: false, message: "이름을 입력하세요." })
         }
-        const user = await User.findById(userId);
+        const user = req.user;
         if (file) {
             user.avatar = process.env.NODE_ENV === "production" ? file.location : `http://localhost:4000/${file.path}`;
         }
@@ -346,8 +346,8 @@ export const updateUserInfo = async (req, res) => {
 
 export const updateUserPwd = async (req, res) => {
     try {
-        const { pwd, newPwd, userId } = req.body;
-        const user = await User.findById(userId);
+        const { pwd, newPwd } = req.body;
+        const user = req.user;
         const match = await User.verifyPwd(pwd, user.pwd);
         if (!match) {
             return res.json({ success: false, message: "현재 비밀번호가 틀립니다." })
@@ -363,13 +363,10 @@ export const updateUserPwd = async (req, res) => {
 
 export const updateBlogInfo = async (req, res) => {
     try {
-        const { userId, introduction, name } = req.body;
-        await User.findByIdAndUpdate(userId, {
-            blogInfo: {
-                introduction,
-                name
-            }
-        })
+        const { introduction, name } = req.body;
+        const user = req.user;
+        user.blogInfo = { introduction, name };
+        await user.save();
         return res.status(200).json({ success: true });
     } catch (err) {
         console.log(err);
@@ -379,7 +376,7 @@ export const updateBlogInfo = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const { _id: userId } = req.user;
         await Folder.deleteMany({ owner: userId });
         await Post.deleteMany({ author: userId });
         await User.findByIdAndRemove(userId);

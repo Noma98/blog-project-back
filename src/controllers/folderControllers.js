@@ -2,14 +2,14 @@ import Folder from '../models/Folder.js'
 
 export const createFolder = async (req, res) => {
     const user = req.user;
-    const name = `Sample Folder_${user.folders.length}`;
+    const name = `Sample Folder ${user.folders.length + 1}`;
     try {
-        await Folder.create({
+        const folder = new Folder({
             name,
             owner: user._id
         });
-        const newFolder = await Folder.findOne({ owner: user._id, name });
-        user.folders.push(newFolder._id);
+        await folder.save();
+        user.folders.push(folder._id);
         await user.save();
         res.status(200).json({ success: true });
     } catch (err) {
