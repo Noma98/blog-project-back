@@ -8,7 +8,7 @@ export const createUser = async (data, socialOnly) => {
         blogInfo: {
             name: `${name}'s blog`
         },
-        ...(socialOnly && { socialOnly }),
+        ...(socialOnly === false && { socialOnly }),
         ...(pwd && { pwd }),
         ...(avatar && { avatar })
     });
