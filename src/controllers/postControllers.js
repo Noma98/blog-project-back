@@ -4,11 +4,12 @@ import Post from '../models/Post.js'
 export const createPost = async (req, res) => {
     try {
         const user = req.user;
-        const { title, description, tagArray, selectedFolder: folderId } = req.body;
+        const { title, description, tagArray, selectedFolder: folderId, htmlContent } = req.body;
         const createdAt = Date.now();
         const newPost = new Post({
             title: title || "제목 없음",
             description,
+            htmlContent,
             author: user._id,
             folder: folderId,
             createdAt,
@@ -42,11 +43,12 @@ export const deletePost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
     try {
-        const { postId, title, description, selectedFolder, tagArray, prevFolderId } = req.body;
+        const { postId, title, description, htmlContent, selectedFolder, tagArray, prevFolderId } = req.body;
 
         await Post.findByIdAndUpdate(postId, {
             title,
             description,
+            htmlContent,
             folder: selectedFolder,
             tags: tagArray
         });
@@ -151,6 +153,16 @@ export const findAllResults = async (req, res) => {
         ]).sort({ createdAt: -1 }).populate("author");
 
         return res.status(200).json({ success: true, payload: posts });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
+export const convertImage = async (req, res) => {
+    try {
+        const file = req.file;
+        const url = process.env.NODE_ENV === "production" ? file.location : `http://localhost:4000/${file.path}`;
+        return res.status(200).json({ success: true, payload: { url } });
     } catch (err) {
         console.log(err);
         return res.json({ success: false });

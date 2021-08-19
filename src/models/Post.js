@@ -4,6 +4,7 @@ const postSchema = new mongoose.Schema({
     title: { type: String, required: true },
     createdAt: { type: Date, required: true },
     description: { type: String, required: true },
+    htmlContent: { type: String, required: true },
     tags: [{
         id: String,
         name: String,
