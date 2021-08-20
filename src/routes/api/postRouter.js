@@ -5,9 +5,9 @@ import { imgUploader } from '../../middlewares/upload.js';
 
 const postRouter = express.Router();
 
-postRouter.post("/create", authMiddleware, createPost);
+postRouter.post("/create", authMiddleware, imgUploader('thumbnails').single('thumbnail'), createPost);
 postRouter.post("/delete", authMiddleware, deletePost);
-postRouter.post("/update", authMiddleware, updatePost);
+postRouter.post("/update", authMiddleware, imgUploader('thumbnails').single('thumbnail'), updatePost);
 postRouter.post("/read", findPostsByFolderId);
 postRouter.post("/detail", findPostByPostId);
 postRouter.post("/user", findPostsByUserId);

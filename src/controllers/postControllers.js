@@ -3,8 +3,14 @@ import Post from '../models/Post.js'
 
 export const createPost = async (req, res) => {
     try {
+        const file = req.file; //없으면 undefined
+        let thumbnail = "";
+        if (file) {
+            thumbnail = process.env.NODE_ENV === "production" ? file.location : `http://localhost:4000/${file.path}`;
+        }
         const user = req.user;
-        const { title, description, tagArray, selectedFolder: folderId, htmlContent } = req.body;
+        const { title, description, tagArray, selectedFolder: folderId, htmlContent } = JSON.parse(req.body.data);
+
         const createdAt = Date.now();
         const newPost = new Post({
             title: title || "제목 없음",
@@ -14,6 +20,7 @@ export const createPost = async (req, res) => {
             folder: folderId,
             createdAt,
             tags: tagArray,
+            thumbnail
         })
         await newPost.save();
         const folder = await Folder.findById(folderId);
@@ -43,14 +50,20 @@ export const deletePost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
     try {
-        const { postId, title, description, htmlContent, selectedFolder, tagArray, prevFolderId } = req.body;
+        const { postId, title, description, htmlContent, selectedFolder, tagArray, prevFolderId, update } = JSON.parse(req.body.data);
 
+        const file = req.file; //없으면 undefined
+        let thumbnail = "";
+        if (file) {
+            thumbnail = process.env.NODE_ENV === "production" ? file.location : `http://localhost:4000/${file.path}`;
+        }
         await Post.findByIdAndUpdate(postId, {
             title,
             description,
             htmlContent,
             folder: selectedFolder,
-            tags: tagArray
+            tags: tagArray,
+            ...(update && { thumbnail })
         });
         if (prevFolderId !== selectedFolder) {
             //이전 폴더에서 삭제
