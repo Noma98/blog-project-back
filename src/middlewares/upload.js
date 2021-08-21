@@ -21,7 +21,7 @@ export const imgUploader = (dest) => {
     return multer({
         dest: `uploads/${dest}/`,
         limits: {
-            fileSize: 200000,
+            fileSize: 300000,
         },
         storage: process.env.NODE_ENV === "production" ? s3ImageUploader(dest) : undefined
     })
