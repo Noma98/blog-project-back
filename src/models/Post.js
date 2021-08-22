@@ -10,6 +10,7 @@ const postSchema = new mongoose.Schema({
         name: String,
     }],
     thumbnail: { type: String, default: "" },
+    comments: [{ type: mongoose.Types.ObjectId, ref: "Comment" }],
     author: {
         type: mongoose.Types.ObjectId,
         required: true,
