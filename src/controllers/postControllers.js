@@ -1,3 +1,4 @@
+import Comment from '../models/Comment.js';
 import Folder from '../models/Folder.js';
 import Post from '../models/Post.js'
 
@@ -41,6 +42,7 @@ export const deletePost = async (req, res) => {
         const updated = folder.posts.filter(post => String(post) !== String(postId));
         folder.posts = updated;
         await folder.save();
+        await Comment.deleteMany({ post: postId });
         return res.status(200).json({ success: true });
     } catch (err) {
         console.log(err);
@@ -96,7 +98,7 @@ export const findPostsByFolderId = async (req, res) => {
 export const findPostByPostId = async (req, res) => {
     try {
         const { postId } = req.body;
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate("comments").populate("author");
         return res.status(200).json({ success: true, payload: post });
     } catch (err) {
         console.log(err);
