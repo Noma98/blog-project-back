@@ -98,7 +98,10 @@ export const findPostsByFolderId = async (req, res) => {
 export const findPostByPostId = async (req, res) => {
     try {
         const { postId } = req.body;
-        const post = await Post.findById(postId).populate("comments").populate("author");
+        const post = await Post.findById(postId).populate({
+            path: 'comments',
+            populate: { path: 'author', select: 'name avatar' },
+        })
         return res.status(200).json({ success: true, payload: post });
     } catch (err) {
         console.log(err);

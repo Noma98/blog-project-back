@@ -3,10 +3,10 @@ import Post from '../models/Post';
 
 export const createComment = async (req, res) => {
     try {
-        const { text, userId, postId } = req.body;
+        const { text, postId } = req.body;
         const comment = new Comment({
             text,
-            author: userId,
+            author: req.user._id,
             createdAt: Date.now(),
             post: postId,
         });
