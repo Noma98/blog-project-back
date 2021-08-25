@@ -20,3 +20,17 @@ export const createComment = async (req, res) => {
         return res.json({ success: false });
     }
 }
+export const deleteComment = async (req, res) => {
+    try {
+        const { commentId, postId } = req.body;
+        const post = await Post.findById(postId);
+        const updated = post.comments.filter(post => String(post) !== String(commentId));
+        post.comments = updated;
+        await post.save();
+        await Comment.findByIdAndRemove(commentId);
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.log(err);
+        return res.json({ success: false });
+    }
+}
