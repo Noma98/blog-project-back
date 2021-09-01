@@ -57,7 +57,7 @@ export const login = async (req, res) => {
                 secure: true,
                 maxAge: 1000 * 60 * 60 * 24
             })
-            .json({ success: true });
+            .json({ success: true, payload: { name: user.name } });
     } catch (err) {
         console.log(err);
         return res.json({
